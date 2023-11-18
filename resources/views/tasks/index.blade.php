@@ -52,6 +52,8 @@
                 Not Started
         @endswitch
       </div>
+      
+          <a href="{{ route('tasks.edit', ['id' => $item->id]) }}">Edit</a>
     </div>
     @endforeach
   </div>
