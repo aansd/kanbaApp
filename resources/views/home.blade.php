@@ -11,6 +11,9 @@
 </head>
 
 <body>
+    @extends('layouts.master')
+
+    @section('main')
   <div class="container">
     <div class="main">
       <div class="task-summary-container">
@@ -26,7 +29,9 @@
         <h2>You still have 5 tasks left</h2>
       </div>
     </div>
+   
   </div>
+  @endsection
 </body>
 
 </html>
