@@ -24,10 +24,11 @@ Route::prefix('tasks')
     ->controller(TaskController::class)
     ->group(function (){
     Route::get('/', 'index')->name('index');
-    Route::get('{id}/edit', 'edit')->name('edit');
+    Route::get('/create', 'create')->name('create');
+    Route::get('/{id}/edit', 'edit')->name('edit');
 });
 
-
-Route::get('/tasks/create', [TaskController::class, 'create'])->name('tasks.create');
+// route basic
 // Route::get('/tasks/', [TaskController::class, 'index'])->name('tasks.index');
+// Route::get('/tasks/create', [TaskController::class, 'create'])->name('tasks.create');
 // Route::get('/tasks/{id}/edit', [TaskController::class, 'edit'])->name('tasks.edit');
