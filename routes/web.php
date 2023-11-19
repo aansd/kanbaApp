@@ -19,7 +19,10 @@ Route::get('/', function () {
 })->name('home');
 
 //group tasks route
-Route::prefix('tasks')->name('tasks.')->controller(TaskController::class)->group(function (){
+Route::prefix('tasks')
+    ->name('tasks.')
+    ->controller(TaskController::class)
+    ->group(function (){
     Route::get('/', 'index')->name('index');
     Route::get('{id}/edit', 'edit')->name('edit');
 });
