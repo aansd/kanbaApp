@@ -73,5 +73,18 @@ class TaskController extends Controller
         return redirect()->route('tasks.index');
     }
     
+    public function delete($id)
+    {
+        $pageTitle = 'Delete Task';
+        $task = Task::find($id);
+        return view('tasks.delete', ['pageTitle' => $pageTitle, 'task' => $task]);
+    }
+
+    public function destroy($id)
+    {
+        $task = Task::find($id);
+        $task->delete();
+        return redirect()->route('tasks.index');
+    }
 
 }

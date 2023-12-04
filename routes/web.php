@@ -29,7 +29,8 @@ Route::prefix('tasks')
     Route::get('/{id}', 'show')->name('show');
     Route::get('/{id}/edit', 'edit')->name('edit');
     Route::put('/{id}', 'update')->name('update');
-    Route::delete('/{id}', 'destroy');
+    Route::get('/{id}', 'delete')->name('delete');
+    Route::delete('/{id}', 'destroy')->name('destroy');
 });
 
 // route basic

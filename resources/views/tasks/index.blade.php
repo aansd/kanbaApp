@@ -49,6 +49,7 @@
       </div>
       
           <a href="{{ route('tasks.edit', ['id' => $item->id]) }}">Edit</a>
+          <a href="{{ route('tasks.delete', ['id' => $item->id]) }}">Delete</a>
     </div>
     @endforeach
   </div>
