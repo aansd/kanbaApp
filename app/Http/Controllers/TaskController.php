@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redis;
 
 class TaskController extends Controller
 {
@@ -13,7 +14,12 @@ class TaskController extends Controller
 
     public function index()
     {
+        $pageTitle = 'Task List';
         $tasks = Task::all();
+        return view('tasks.index', [
+            'pageTitle' => $pageTitle,
+            'tasks' => $tasks,
+        ]);
     }
 
     public function create()
@@ -25,7 +31,10 @@ class TaskController extends Controller
     public function edit($id)
     {
         
-        $taks = Task::find($id);
+        $pageTitle = 'Edit Task';
+        $task = Task::find($id);
+
+        return view('tasks.edit', ['pageTitle' => $pageTitle, 'task' => $task]);
     }
 
     public function store(Request $request)
@@ -46,6 +55,21 @@ class TaskController extends Controller
             'status' => $request->status,
         ]);
 
+        return redirect()->route('tasks.index');
+    }
+
+    public function update(Request $request, $id)
+    {
+        
+
+        $task = Task::find($id);
+        $task->update([
+            'name' => $request->name,
+            'detail' => $request->detail,
+            'due_date' => $request->due_date,
+            'status' => $request->status,
+        ]
+    );
         return redirect()->route('tasks.index');
     }
     
