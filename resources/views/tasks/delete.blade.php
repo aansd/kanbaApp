@@ -8,8 +8,7 @@
     <form
       class="form"
       method="POST"
-      action="{{ route('tasks.destroy', ['id' => $task->id]) }}"
-    >
+      action="{{ route('tasks.destroy', ['id' => $task->id]) }}">
       @method('DELETE')
       @csrf
       <p>You are going to delete <strong>"{{ $task->name }}"</strong></p>

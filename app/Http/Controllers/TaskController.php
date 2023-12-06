@@ -16,10 +16,7 @@ class TaskController extends Controller
     {
         $pageTitle = 'Task List';
         $tasks = Task::all();
-        return view('tasks.index', [
-            'pageTitle' => $pageTitle,
-            'tasks' => $tasks,
-        ]);
+        return view('tasks.index', ['pageTitle' => $pageTitle,'tasks' => $tasks,]);
     }
 
     public function create()
@@ -60,7 +57,14 @@ class TaskController extends Controller
 
     public function update(Request $request, $id)
     {
-        
+        $request->validate(
+            [
+                'name' => 'required',
+                'due_date' => 'required',
+                'status' => 'required',
+            ],
+            $request->all()
+        );
 
         $task = Task::find($id);
         $task->update([
@@ -86,5 +90,37 @@ class TaskController extends Controller
         $task->delete();
         return redirect()->route('tasks.index');
     }
+
+    public function progress()
+    {
+        $title = 'Task Progress';
+        $tasks = Task::all();
+        $filteredTasks = $tasks->groupBy('status');
+        // $tasks = [
+        //     'not_started' => $filteredTasks->get('not_started' , []),
+        //     'in_progress' => $filteredTasks->get('in_progress', []),
+        //     'completed' => $filteredTasks->get('completed', []),
+        //     'in_review' => $filteredTasks->get('in_review', []),
+        // ];
+        $tasks = [
+            Task::STATUS_NOT_STARTED => $filteredTasks->get(
+                Task::STATUS_NOT_STARTED, []
+            ),
+            Task::STATUS_IN_PROGRESS => $filteredTasks->get(
+                Task::STATUS_IN_PROGRESS, []
+            ),
+            Task::STATUS_IN_REVIEW => $filteredTasks->get(
+                Task::STATUS_IN_REVIEW, []
+            ),
+            Task::STATUS_COMPLETED => $filteredTasks->get(
+                Task::STATUS_COMPLETED, []
+            ),
+        ];
+        return view('tasks.progress', [
+            'pageTitle' => $title,
+            'tasks' => $tasks,
+        ]);
+    }
+    
 
 }

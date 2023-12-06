@@ -72,6 +72,7 @@ class TaskSeeder extends Seeder
                 'updated_at' => $timestamp,
             ],
         ];
+        
 
         DB::table('tasks')->insert($tasks);
     }
