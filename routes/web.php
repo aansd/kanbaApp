@@ -29,8 +29,9 @@ Route::prefix('tasks')
     Route::get('/{id}/edit', 'edit')->name('edit');
     Route::put('/{id}', 'update')->name('update');
     Route::get('/{id}/delete', 'delete')->name('delete');
-    Route::get('progress', 'progress')->name('progress');
     Route::delete('/{id}', 'destroy')->name('destroy');
+    Route::get('progress', 'progress')->name('progress');
+    Route::patch('/{id}/move', 'move')->name('move');
 });
 
 
