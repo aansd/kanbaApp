@@ -31,10 +31,10 @@
       <div class="form-item">
         <label>Progress:</label>
         <select class="form-input" name="status">
-          <option @if(old('status') == 'not_started') selected @endif value="not_started">Not Started</option>
-          <option @if(old('status') == 'in_progress') selected @endif value="in_progress">In Progress</option>
-          <option @if(old('status') == 'in_review') selected @endif value="in_review">Waiting/In Review</option>
-          <option @if(old('status') == 'completed') selected @endif value="completed">Completed</option>
+          <option @if(old('status', $status == 'not_started')) selected @endif value="not_started">Not Started</option>
+          <option @if(old('status', $status == 'in_progress')) selected @endif value="in_progress">In Progress</option>
+          <option @if(old('status', $status == 'in_review')) selected @endif value="in_review">Waiting/In Review</option>
+          <option @if(old('status', $status == 'completed')) selected @endif value="completed">Completed</option>
         </select>
         @error('status')
         <div class="alert-danger">{{ $message }}</div>
