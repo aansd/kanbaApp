@@ -1,16 +1,18 @@
+@php
+use App\Models\Task;
+@endphp
 <div class="task-progress-card">
     <div class="task-progress-card-left">
       @if ($task->status == 'completed')
-        <div class="material-icons task-progress-card-top-checked">check_circle</div>
-      @else
-      <div>
-        <form method="post" action="{{ route('tasks.move', ['id' => $task->id, 'status' => 'completed']) }}">
-          <button class="material-icons task-progress-card-top-check">check_circle</button>
+        <div class="material-icons task-progress-card-top-checked" >check_circle</div>      
+        @else       
+        <form method="post" action="{{ route('tasks.move', ['id' => $task->id, 'status' =>Task::STATUS_COMPLETED]) }}" id="setcompleted-{{$task->id}}">
           @method('patch')
           @csrf
-        </div>
+          <div class="material-icons task-progress-card-top-check" onclick="document.getElementById('setcompleted-{{$task->id}}').submit()">check_circle</div>
       </form>
       @endif
+
       <a href="{{ route('tasks.edit', ['id' => $task->id]) }}" class="material-icons task-progress-card-top-edit">more_vert</a>
     </div>
     <p class="task-progress-card-title">{{ $task->name }}</p>
@@ -24,9 +26,8 @@
       @if ($leftStatus)
       <form
       action="{{ route('tasks.move', ['id' => $task->id, 'status' => $leftStatus]) }}" 
-      method="POST"
-    >
-      @method('patch')
+      method="POST">
+      @method('PATCH')
       @csrf
         <button class="material-icons">chevron_left</button>
       </form>
@@ -35,12 +36,11 @@
       @if ($rightStatus)
       <form
         action="{{ route('tasks.move', ['id' => $task->id, 'status' => $rightStatus]) }}"
-        method="POST"
-      >
-        @method('patch')
+        method="POST">
+        @method('PATCH')
         @csrf
         <button class="material-icons">chevron_right</button>
       </form>
-      @endif
+        @endif
+      </div>
     </div>
-  </div>
