@@ -53,5 +53,6 @@
 
       <button type="submit" class="form-button">Submit</button>
     </form>
+    <p class="auth-link">Already have an account? <a href="{{ route('auth.login') }}">Login here</a></p>
   </div>
 @endsection
