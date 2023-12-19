@@ -131,17 +131,29 @@ class TaskController extends Controller
         'status' => $request->status,
     ]);
 
-    return redirect()->route('tasks.progress');
+    $url = url()->previous();
+    if (strpos($url, route('tasks.progress')) )
+     {
+        return redirect()->route('tasks.progress');
+     } 
+    elseif (strpos($url, route('tasks.index')) ) 
+     {
+        return redirect()->route('tasks.index');
+     } 
+     else 
+     {
+        return back()->withInput();
+     }
     }
     
-    public function complete($id)
-    {
-        $task = Task::findOrFail($id);
+    // public function complete($id)
+    // {
+    //     $task = Task::findOrFail($id);
 
-        $task->update([
-            'status' => 'completed'
-        ]);
-        return redirect()->route('tasks.index'); 
-    }
+    //     $task->update([
+    //         'status' => 'completed'
+    //     ]);
+    //     return redirect()->route('tasks.index'); 
+    // }
 
 }
