@@ -11,12 +11,11 @@
 </head>
 
 <body>
-  <div class="container">
-    @include('partials.sidebar')
-    <div class="main">
-      @yield('main')
+    <div class="container">
+      @include('partials.sidebar')
+      <div class="main">
+        @yield('main')
+      </div>
     </div>
-  </div>
-</body>
-
+  </body>
 </html>

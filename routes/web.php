@@ -16,28 +16,26 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return redirect()->route('home');
-})->name('home')->middleware('auth');;
+    return view('home');
+})->name('home')->middleware('auth');
 
-//group tasks route
 Route::prefix('tasks')
     ->name('tasks.')
     ->middleware('auth')
     ->controller(TaskController::class)
-    ->group(function (){
-    Route::get('/', 'index')->name('index');
-    Route::get('/create', 'create')->name('create');
-    Route::post('/', 'store')->name('store');
-    Route::get('/{id}/edit', 'edit')->name('edit');
-    Route::put('/{id}', 'update')->name('update');
-    Route::get('/{id}/delete', 'delete')->name('delete');
-    Route::delete('/{id}', 'destroy')->name('destroy');
-    Route::get('progress', 'progress')->name('progress');
-    Route::patch('/{id}/move', 'move')->name('move');
-    // Route::patch('{id}/complete', 'complete')->name('complete');
-});
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('{id}/edit', 'edit')->name('edit');
+        Route::put('/{id}', 'update')->name('update');
+        Route::get('/{id}/delete', 'delete')->name('delete');
+        Route::delete('/{id}', 'destroy')->name('destroy');
+        Route::get('progress', 'progress')->name('progress');
+        Route::patch('{id}/move', 'move')->name('move');
+    });
 
-Route::name('auth.')
+    Route::name('auth.')
     ->controller(AuthController::class)
     ->group(function () {
         Route::middleware('guest')->group(function () {
@@ -46,12 +44,8 @@ Route::name('auth.')
             Route::get('login', 'loginForm')->name('loginForm');
             Route::post('login', 'login')->name('login');
         });
+
         Route::middleware('auth')->group(function () {
             Route::post('logout', 'logout')->name('logout');
         });
     });
-
-// route basic
-// Route::get('/tasks/', [TaskController::class, 'index'])->name('tasks.index');
-// Route::get('/tasks/create', [TaskController::class, 'create'])->name('tasks.create');
-// Route::get('/tasks/{id}/edit', [TaskController::class, 'edit'])->name('tasks.edit');

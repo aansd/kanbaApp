@@ -4,19 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redis;
 
 class TaskController extends Controller
 {
     public function __construct()
     {
-    }
 
+    }
+    
     public function index()
     {
         $pageTitle = 'Task List';
-        $tasks = Task::all();
-        return view('tasks.index', ['pageTitle' => $pageTitle,'tasks' => $tasks,]);
+        $tasks = Task::all(); 
+        return view('tasks.index', [
+            'pageTitle' => $pageTitle, 
+            'tasks' => $tasks,
+        ]);
     }
 
     public function create(Request $request)
@@ -28,31 +31,28 @@ class TaskController extends Controller
 
     public function edit($id)
     {
-        
         $pageTitle = 'Edit Task';
         $task = Task::find($id);
-
         return view('tasks.edit', ['pageTitle' => $pageTitle, 'task' => $task]);
     }
 
     public function store(Request $request)
     {
         $request->validate(
-        [
-            'name' => 'required',
-            'due_date' => 'required',
-            'status' => 'required',
-        ],
-        $request->all()
-    );
-
+            [
+                'name' => 'required',
+                'due_date' => 'required',
+                'status' => 'required',
+            ],
+            $request->all()
+        );
+    
         Task::create([
             'name' => $request->name,
             'detail' => $request->detail,
             'due_date' => $request->due_date,
             'status' => $request->status,
         ]);
-
         return redirect()->route('tasks.index');
     }
 
@@ -77,7 +77,7 @@ class TaskController extends Controller
     );
         return redirect()->route('tasks.index');
     }
-    
+
     public function delete($id)
     {
         $pageTitle = 'Delete Task';
@@ -91,6 +91,7 @@ class TaskController extends Controller
         $task->delete();
         return redirect()->route('tasks.index');
     }
+
 
     public function progress()
     {
@@ -145,15 +146,4 @@ class TaskController extends Controller
         return back()->withInput();
      }
     }
-    
-    // public function complete($id)
-    // {
-    //     $task = Task::findOrFail($id);
-
-    //     $task->update([
-    //         'status' => 'completed'
-    //     ]);
-    //     return redirect()->route('tasks.index'); 
-    // }
-
 }
