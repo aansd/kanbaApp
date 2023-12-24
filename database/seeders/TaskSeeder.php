@@ -63,17 +63,8 @@ class TaskSeeder extends Seeder
                 'created_at' => $timestamp,
                 'updated_at' => $timestamp,
             ],
-            [
-                'name' => 'Develop Final Project',
-                'detail' => 'Kanban project using PHP and Laravel',
-                'due_date' => '2023-04-30',
-                'status' => 'not_started',
-                'created_at' => $timestamp,
-                'updated_at' => $timestamp,
-            ],
         ];
-        
 
         DB::table('tasks')->insert($tasks);
-    }
+}
 }
