@@ -53,7 +53,7 @@ class TaskController extends Controller
             'status' => $request->status,
         ]);
 
-        return redirect()->route('tasks.index');
+                return back()->withInput();
     }
 
     public function update(Request $request, $id)
@@ -75,7 +75,7 @@ class TaskController extends Controller
             'status' => $request->status,
         ]
     );
-        return redirect()->route('tasks.index');
+            return back()->withInput();
     }
     
     public function delete($id)
