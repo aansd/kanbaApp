@@ -53,7 +53,19 @@ class TaskController extends Controller
             'status' => $request->status,
         ]);
 
+        $url = url()->previous();
+    if (strpos($url, route('tasks.progress')) )
+     {
+        return redirect()->route('tasks.progress');
+     } 
+    elseif (strpos($url, route('tasks.index')) ) 
+     {
         return redirect()->route('tasks.index');
+     } 
+     else 
+     {
+        return back()->withInput();
+     }
     }
 
     public function update(Request $request, $id)
@@ -75,7 +87,19 @@ class TaskController extends Controller
             'status' => $request->status,
         ]
     );
+    $url = url()->previous();
+    if (strpos($url, route('tasks.progress')) )
+     {
+        return redirect()->route('tasks.progress');
+     } 
+    elseif (strpos($url, route('tasks.index')) ) 
+     {
         return redirect()->route('tasks.index');
+     } 
+     else 
+     {
+        return back()->withInput();
+     }
     }
     
     public function delete($id)
