@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class TaskController extends Controller
 {
@@ -12,10 +14,12 @@ class TaskController extends Controller
 
     }
     
-    public function index()
+    public function index(Request $request)
     {
         $pageTitle = 'Task List';
         $tasks = Task::all(); 
+        $request->session()->put('previousPage', 'tasks.index');
+
         return view('tasks.index', [
             'pageTitle' => $pageTitle, 
             'tasks' => $tasks,
@@ -26,6 +30,7 @@ class TaskController extends Controller
     {
         $pageTitle = 'Create Task';
         $status = $request->status;
+        session()->put('previousPage', url()->previous());
         return view('tasks.create', ['pageTitle' => $pageTitle, 'status' => $status]);
     }
 
@@ -33,6 +38,7 @@ class TaskController extends Controller
     {
         $pageTitle = 'Edit Task';
         $task = Task::find($id);
+        session()->put('previousPage', url()->previous());
         return view('tasks.edit', ['pageTitle' => $pageTitle, 'task' => $task]);
     }
 
@@ -52,8 +58,16 @@ class TaskController extends Controller
             'detail' => $request->detail,
             'due_date' => $request->due_date,
             'status' => $request->status,
+            'user_id' => Auth::user()->id
         ]);
-        return redirect()->route('tasks.index');
+        $previousPage = session('previousPage');
+
+        // Bersihkan session
+        session()->forget('previousPage');
+
+        // Redirect sesuai dengan halaman sebelumnya
+        return redirect()->to($previousPage ?: route('tasks.index'));
+
     }
 
     public function update(Request $request, $id)
@@ -73,9 +87,16 @@ class TaskController extends Controller
             'detail' => $request->detail,
             'due_date' => $request->due_date,
             'status' => $request->status,
+            
         ]
     );
-        return redirect()->route('tasks.index');
+    $previousPage = session('previousPage');
+
+        // Bersihkan session
+        session()->forget('previousPage');
+
+        // Redirect sesuai dengan halaman sebelumnya
+        return redirect()->to($previousPage ?: route('tasks.index'));
     }
 
     public function delete($id)
@@ -93,22 +114,23 @@ class TaskController extends Controller
     }
 
 
-    public function progress()
+    public function progress(Request $request)
     {
         $title = 'Task Progress';
         $tasks = Task::all();
+        
         $filteredTasks = $tasks->groupBy('status');
         // $tasks = [
-        //     'not_started' => $filteredTasks->get('not_started' , []),
-        //     'in_progress' => $filteredTasks->get('in_progress', []),
-        //     'completed' => $filteredTasks->get('completed', []),
-        //     'in_review' => $filteredTasks->get('in_review', []),
-        // ];
-        $tasks = [
-            Task::STATUS_NOT_STARTED => $filteredTasks->get(
-                Task::STATUS_NOT_STARTED, []
-            ),
-            Task::STATUS_IN_PROGRESS => $filteredTasks->get(
+            //     'not_started' => $filteredTasks->get('not_started' , []),
+            //     'in_progress' => $filteredTasks->get('in_progress', []),
+            //     'completed' => $filteredTasks->get('completed', []),
+            //     'in_review' => $filteredTasks->get('in_review', []),
+            // ];
+            $tasks = [
+                Task::STATUS_NOT_STARTED => $filteredTasks->get(
+                    Task::STATUS_NOT_STARTED, []
+                ),
+                Task::STATUS_IN_PROGRESS => $filteredTasks->get(
                 Task::STATUS_IN_PROGRESS, []
             ),
             Task::STATUS_IN_REVIEW => $filteredTasks->get(
@@ -118,6 +140,7 @@ class TaskController extends Controller
                 Task::STATUS_COMPLETED, []
             ),
         ];
+        $request->session()->put('previousPage', 'tasks.progress');
         return view('tasks.progress', [
             'pageTitle' => $title,
             'tasks' => $tasks,
