@@ -5,7 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+<<<<<<< HEAD
 
+=======
+use Illuminate\Support\Facades\Redis;
+>>>>>>> 7d67f766982ee914058564b38abee525efdd3e5e
 
 class TaskController extends Controller
 {
@@ -19,7 +23,10 @@ class TaskController extends Controller
         $pageTitle = 'Task List';
         $tasks = Task::all(); 
         $request->session()->put('previousPage', 'tasks.index');
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7d67f766982ee914058564b38abee525efdd3e5e
         return view('tasks.index', [
             'pageTitle' => $pageTitle, 
             'tasks' => $tasks,
@@ -58,7 +65,11 @@ class TaskController extends Controller
             'detail' => $request->detail,
             'due_date' => $request->due_date,
             'status' => $request->status,
+<<<<<<< HEAD
             'user_id' => Auth::user()->id
+=======
+            'user_id' => Auth::user()->id,
+>>>>>>> 7d67f766982ee914058564b38abee525efdd3e5e
         ]);
         $previousPage = session('previousPage');
 
@@ -67,7 +78,10 @@ class TaskController extends Controller
 
         // Redirect sesuai dengan halaman sebelumnya
         return redirect()->to($previousPage ?: route('tasks.index'));
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7d67f766982ee914058564b38abee525efdd3e5e
     }
 
     public function update(Request $request, $id)
@@ -92,11 +106,19 @@ class TaskController extends Controller
     );
     $previousPage = session('previousPage');
 
+<<<<<<< HEAD
         // Bersihkan session
         session()->forget('previousPage');
 
         // Redirect sesuai dengan halaman sebelumnya
         return redirect()->to($previousPage ?: route('tasks.index'));
+=======
+    // Bersihkan session
+    session()->forget('previousPage');
+
+    // Redirect sesuai dengan halaman sebelumnya
+    return redirect()->to($previousPage ?: route('tasks.index'));
+>>>>>>> 7d67f766982ee914058564b38abee525efdd3e5e
     }
 
     public function delete($id)
