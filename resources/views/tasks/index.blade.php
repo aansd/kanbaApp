@@ -4,7 +4,7 @@
 @php
 use App\Models\Task;
 @endphp
-<body>
+
     <div class="task-list-container">
       <h1 class="task-list-heading">Task List</h1>
 
@@ -21,13 +21,14 @@ use App\Models\Task;
         <div class="task-list-header-detail">Detail</div>
         <div class="task-list-header-due-date">Due Date</div>
         <div class="task-list-header-progress">Progress</div>
+        <div class="task-list-header-owner-name">Owner</div>
       </div>
   
        @foreach ($tasks as $item)
         <div class="table-body">
           <div class="table-body-task-name">
             @if ($item->status == 'completed')
-            <span class="material-icons check-icon-completed check-icon " >
+            <span class="material-icons check-icon-completed check-icon" >
               check_circle
             </span>
             @else
@@ -38,6 +39,7 @@ use App\Models\Task;
           </form>
             @endif
             {{  $item->name }}
+        
           </div>
           <div class="table-body-detail"> {{ $item->detail }} </div>
           <div class="table-body-due-date"> {{ $item->due_date }} </div>
@@ -56,11 +58,12 @@ use App\Models\Task;
                 Not Started
             @endswitch
           </div>
+            <div class="table-body-owner-name">{{ $item->user->name }}</div>
+          <div>
           <a href="{{ route('tasks.edit', ['id' => $item->id]) }}">Edit</a>
-          &nbsp;
           <a href="{{ route('tasks.delete', ['id' => $item->id]) }}">Delete</a>
         </div>
-        @endforeach
-        </div>
       </div>
-   @endsection
+    @endforeach
+  </div>
+@endsection
