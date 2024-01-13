@@ -3,13 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-<<<<<<< HEAD
-
-=======
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Redis;
->>>>>>> 7d67f766982ee914058564b38abee525efdd3e5e
+
 
 class TaskController extends Controller
 {
@@ -23,10 +22,6 @@ class TaskController extends Controller
         $pageTitle = 'Task List';
         $tasks = Task::all(); 
         $request->session()->put('previousPage', 'tasks.index');
-<<<<<<< HEAD
-
-=======
->>>>>>> 7d67f766982ee914058564b38abee525efdd3e5e
         return view('tasks.index', [
             'pageTitle' => $pageTitle, 
             'tasks' => $tasks,
@@ -45,6 +40,7 @@ class TaskController extends Controller
     {
         $pageTitle = 'Edit Task';
         $task = Task::find($id);
+        Gate::authorize('update', $task);
         session()->put('previousPage', url()->previous());
         return view('tasks.edit', ['pageTitle' => $pageTitle, 'task' => $task]);
     }
@@ -65,11 +61,8 @@ class TaskController extends Controller
             'detail' => $request->detail,
             'due_date' => $request->due_date,
             'status' => $request->status,
-<<<<<<< HEAD
             'user_id' => Auth::user()->id
-=======
-            'user_id' => Auth::user()->id,
->>>>>>> 7d67f766982ee914058564b38abee525efdd3e5e
+
         ]);
         $previousPage = session('previousPage');
 
@@ -78,10 +71,7 @@ class TaskController extends Controller
 
         // Redirect sesuai dengan halaman sebelumnya
         return redirect()->to($previousPage ?: route('tasks.index'));
-<<<<<<< HEAD
 
-=======
->>>>>>> 7d67f766982ee914058564b38abee525efdd3e5e
     }
 
     public function update(Request $request, $id)
@@ -96,6 +86,7 @@ class TaskController extends Controller
         );
 
         $task = Task::find($id);
+        Gate::authorize('update', $task);
         $task->update([
             'name' => $request->name,
             'detail' => $request->detail,
@@ -106,31 +97,26 @@ class TaskController extends Controller
     );
     $previousPage = session('previousPage');
 
-<<<<<<< HEAD
+
         // Bersihkan session
         session()->forget('previousPage');
 
         // Redirect sesuai dengan halaman sebelumnya
         return redirect()->to($previousPage ?: route('tasks.index'));
-=======
-    // Bersihkan session
-    session()->forget('previousPage');
-
-    // Redirect sesuai dengan halaman sebelumnya
-    return redirect()->to($previousPage ?: route('tasks.index'));
->>>>>>> 7d67f766982ee914058564b38abee525efdd3e5e
     }
 
     public function delete($id)
     {
         $pageTitle = 'Delete Task';
         $task = Task::find($id);
+        Gate::authorize('delete', $task);
         return view('tasks.delete', ['pageTitle' => $pageTitle, 'task' => $task]);
     }
 
     public function destroy($id)
     {
         $task = Task::find($id);
+        Gate::authorize('delete', $task);
         $task->delete();
         return redirect()->route('tasks.index');
     }
@@ -140,7 +126,7 @@ class TaskController extends Controller
     {
         $title = 'Task Progress';
         $tasks = Task::all();
-        
+       
         $filteredTasks = $tasks->groupBy('status');
         // $tasks = [
             //     'not_started' => $filteredTasks->get('not_started' , []),
@@ -172,7 +158,7 @@ class TaskController extends Controller
     public function move(int $id, Request $request)
     {
     $task = Task::findOrFail($id);
-
+    Gate::authorize('update', $task);
     $task->update([
         'status' => $request->status,
     ]);
@@ -190,5 +176,23 @@ class TaskController extends Controller
      {
         return back()->withInput();
      }
+    }
+
+    public function home()
+    {
+    $tasks = Task::where('user_id', auth()->id())->get();
+
+    $completed_count = $tasks
+        ->where('status', Task::STATUS_COMPLETED)
+        ->count();
+
+    $uncompleted_count = $tasks
+        ->whereNotIn('status', Task::STATUS_COMPLETED)
+        ->count();
+
+    return view('home', [
+        'completed_count' => $completed_count,
+        'uncompleted_count' => $uncompleted_count,
+    ]);
     }
 }

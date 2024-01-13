@@ -21,6 +21,7 @@ use App\Models\Task;
         <div class="task-list-header-detail">Detail</div>
         <div class="task-list-header-due-date">Due Date</div>
         <div class="task-list-header-progress">Progress</div>
+        <div class="task-list-header-owner-name">Owner</div>
       </div>
   
        @foreach ($tasks as $item)
@@ -56,10 +57,16 @@ use App\Models\Task;
                 Not Started
             @endswitch
           </div>
-          <a href="{{ route('tasks.edit', ['id' => $item->id]) }}">Edit</a>
-          &nbsp;
-          <a href="{{ route('tasks.delete', ['id' => $item->id]) }}">Delete</a>
-        </div>
+          <div class="table-body-owner-name">{{ $item->user->name }}</div>
+          <div class="table-body-links">
+            @can('update', $item)
+              <a href="{{ route('tasks.edit', ['id' => $item->id]) }}">Edit</a>
+            @endcan
+            @can('delete', $item)
+              <a href="{{ route('tasks.delete', ['id' => $item->id]) }}">Delete</a>
+            @endcan
+          </div>
+          </div>
         @endforeach
         </div>
       </div>
