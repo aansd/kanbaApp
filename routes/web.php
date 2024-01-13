@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 
@@ -48,4 +49,19 @@ Route::prefix('tasks')
         Route::middleware('auth')->group(function () {
             Route::post('logout', 'logout')->name('logout');
         });
+
+    });
+
+    Route::prefix('roles')
+    ->name('roles.')
+    ->middleware('auth')
+    ->controller(RoleController::class)
+    ->group(function () {
+        Route::get('', 'index')->name('index');
+        Route::get('create', 'create')->name('create');
+        Route::post('store', 'store')->name('store');
+        Route::get('{id}/edit', 'edit')->name('edit');
+        Route::put('{id}/update', 'update')->name('update');
+        Route::get('{id}/delete', 'delete')->name('delete');
+        Route::delete('{id}/destroy', 'destroy')->name('destroy');
     });
