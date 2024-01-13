@@ -66,10 +66,10 @@ class TaskController extends Controller
         ]);
         $previousPage = session('previousPage');
 
-        // Bersihkan session
+      
         session()->forget('previousPage');
 
-        // Redirect sesuai dengan halaman sebelumnya
+        
         return redirect()->to($previousPage ?: route('tasks.index'));
 
     }
@@ -98,10 +98,10 @@ class TaskController extends Controller
     $previousPage = session('previousPage');
 
 
-        // Bersihkan session
+       
         session()->forget('previousPage');
 
-        // Redirect sesuai dengan halaman sebelumnya
+        
         return redirect()->to($previousPage ?: route('tasks.index'));
     }
 
