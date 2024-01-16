@@ -3,7 +3,7 @@ use App\Models\Task;
 @endphp
 <div class="task-progress-card">
     <div class="task-progress-card-left">
-      @can('update', $task)
+      @canany(['updateAnyTask', 'performAsTaskOwner'], $task)
       @if ($task->status == 'completed')
         <div class="material-icons task-progress-card-top-checked" >check_circle</div>      
         @else       
@@ -15,7 +15,7 @@ use App\Models\Task;
           @endif
       </form>
       
-        @can('update', $task)
+        @canany(['updateAnyTask', 'performAsTaskOwner'], $task)
       <a href="{{ route('tasks.edit', ['id' => $task->id]) }}" class="material-icons task-progress-card-top-edit">more_vert</a>
       @endcan
     </div>
@@ -30,7 +30,7 @@ use App\Models\Task;
       <p>Owner: <strong>{{ $task->user->name }}</strong></p>
     </div>
     <div class="@if ($leftStatus) task-progress-card-left @else task-progress-card-right @endif">
-      @can('update', $task)
+      @canany(['updateAnyTask', 'performAsTaskOwner'], $task)
       @if ($leftStatus)
       <form
       action="{{ route('tasks.move', ['id' => $task->id, 'status' => $leftStatus]) }}" 
@@ -41,7 +41,7 @@ use App\Models\Task;
       </form>
       @endcan
       @endif
-      @can('update', $task)
+      @canany(['updateAnyTask', 'performAsTaskOwner'], $task)
       @if ($rightStatus)
       <form
         action="{{ route('tasks.move', ['id' => $task->id, 'status' => $rightStatus]) }}"

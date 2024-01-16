@@ -20,7 +20,11 @@ class TaskController extends Controller
     public function index(Request $request)
     {
         $pageTitle = 'Task List';
-        $tasks = Task::all(); 
+        if (Gate::allows('viewAnyTask', Task::class)) {
+            $tasks = Task::all();
+        } else {
+            $tasks = Task::where('user_id', Auth::user()->id)->get();
+        }
         $request->session()->put('previousPage', 'tasks.index');
         return view('tasks.index', [
             'pageTitle' => $pageTitle, 
@@ -40,7 +44,9 @@ class TaskController extends Controller
     {
         $pageTitle = 'Edit Task';
         $task = Task::find($id);
-        Gate::authorize('update', $task);
+        if (Gate::denies('performAsTaskOwner', $task)) {
+            Gate::authorize('updateAnyTask', Task::class);
+        }
         session()->put('previousPage', url()->previous());
         return view('tasks.edit', ['pageTitle' => $pageTitle, 'task' => $task]);
     }
@@ -86,7 +92,9 @@ class TaskController extends Controller
         );
 
         $task = Task::find($id);
-        Gate::authorize('update', $task);
+        if (Gate::denies('performAsTaskOwner', $task)) {
+            Gate::authorize('updateAnyTask', Task::class);
+        }
         $task->update([
             'name' => $request->name,
             'detail' => $request->detail,
@@ -109,14 +117,18 @@ class TaskController extends Controller
     {
         $pageTitle = 'Delete Task';
         $task = Task::find($id);
-        Gate::authorize('delete', $task);
+        if (Gate::denies('performAsTaskOwner', $task)) {
+            Gate::authorize('deleteAnyTask', Task::class);
+        }
         return view('tasks.delete', ['pageTitle' => $pageTitle, 'task' => $task]);
     }
 
     public function destroy($id)
     {
         $task = Task::find($id);
-        Gate::authorize('delete', $task);
+        if (Gate::denies('performAsTaskOwner', $task)) {
+            Gate::authorize('deleteAnyTask', Task::class);
+        }
         $task->delete();
         return redirect()->route('tasks.index');
     }
@@ -125,7 +137,11 @@ class TaskController extends Controller
     public function progress(Request $request)
     {
         $title = 'Task Progress';
-        $tasks = Task::all();
+        if (Gate::allows('viewAnyTask', Task::class)) {
+            $tasks = Task::all();
+        } else {
+            $tasks = Task::where('user_id', Auth::user()->id)->get();
+        }
        
         $filteredTasks = $tasks->groupBy('status');
         // $tasks = [
@@ -158,7 +174,9 @@ class TaskController extends Controller
     public function move(int $id, Request $request)
     {
     $task = Task::findOrFail($id);
-    Gate::authorize('update', $task);
+    if (Gate::denies('performAsTaskOwner', $task)) {
+        Gate::authorize('updateAnyTask', Task::class);
+    }
     $task->update([
         'status' => $request->status,
     ]);
