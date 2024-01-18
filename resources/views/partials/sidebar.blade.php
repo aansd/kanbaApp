@@ -24,7 +24,7 @@ use App\Models\User;
     <p class="sidebar-text">Users</p>
   </a>
   @endcan
-  @if (Gate::any(['vieweAnyRole', 'performAsTaskOwner'], Role::class))
+  @if (Gate::any(['viewAnyRole', 'performAsTaskOwner'], Role::class))
   <a class="sidebar-link" href="{{ route('roles.index') }}">
     <span class="material-icons sidebar-icon">settings</span>
     <p class="sidebar-text">Roles</p>
