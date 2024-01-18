@@ -3,12 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
-
+use App\Models\TaskFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Redis;
-
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 
 class TaskController extends Controller
 {
@@ -25,7 +29,8 @@ class TaskController extends Controller
         } else {
             $tasks = Task::where('user_id', Auth::user()->id)->get();
         }
-        $request->session()->put('previousPage', 'tasks.index');
+        // $request->session()->put('previousPage', 'tasks.index');
+        Session::put('halaman_url', request()->fullUrl());
         return view('tasks.index', [
             'pageTitle' => $pageTitle, 
             'tasks' => $tasks,
@@ -58,26 +63,57 @@ class TaskController extends Controller
                 'name' => 'required',
                 'due_date' => 'required',
                 'status' => 'required',
+                'file' => ['max:5000', 'mimes:pdf,jpeg,png'],
+            ],
+            [
+                'file.max' => 'The file size exceed 5 mb',
+                'file.mimes' => 'Must be a file of type: pdf,jpeg,png',
             ],
             $request->all()
         );
+        DB::beginTransaction();
+        try {
+            $task = Task::create([
+                'name' => $request->name,
+                'detail' => $request->detail,
+                'due_date' => $request->due_date,
+                'status' => $request->status,
+                'user_id' => Auth::user()->id
+            ]);
     
-        Task::create([
-            'name' => $request->name,
-            'detail' => $request->detail,
-            'due_date' => $request->due_date,
-            'status' => $request->status,
-            'user_id' => Auth::user()->id
-
-        ]);
-        $previousPage = session('previousPage');
+            $file = $request->file('file');
+            if ($file) {
+                $filename = $file->getClientOriginalName();
+                $path = $file->storePubliclyAs(
+                    'tasks',
+                    $file->hashName(),
+                    'public'
+                );
+    
+                TaskFile::create([
+                    'task_id' => $task->id,
+                    'filename' => $filename,
+                    'path' => $path,
+                ]);
+            }
+    
+            DB::commit();
+    
+            $previousPage = session('previousPage');
 
       
-        session()->forget('previousPage');
-
+            session()->forget('previousPage');
+    
+            
+            return redirect()->to($previousPage ?: route('tasks.index'));
+    
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return redirect()
+                ->route('tasks.create')
+                ->with('error', $th->getMessage());
+        }
         
-        return redirect()->to($previousPage ?: route('tasks.index'));
-
     }
 
     public function update(Request $request, $id)
@@ -103,14 +139,9 @@ class TaskController extends Controller
             
         ]
     );
-    $previousPage = session('previousPage');
-
-
-       
-        session()->forget('previousPage');
-
-        
-        return redirect()->to($previousPage ?: route('tasks.index'));
+    if(Session('halaman_url')){
+        return Redirect(Session('halaman_url'));
+    }
     }
 
     public function delete($id)
@@ -164,7 +195,8 @@ class TaskController extends Controller
                 Task::STATUS_COMPLETED, []
             ),
         ];
-        $request->session()->put('previousPage', 'tasks.progress');
+        // $request->session()->put('previousPage', 'tasks.progress');
+        Session::put('halaman_url', request()->fullUrl());
         return view('tasks.progress', [
             'pageTitle' => $title,
             'tasks' => $tasks,

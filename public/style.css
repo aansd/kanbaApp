@@ -127,22 +127,38 @@ body {
 .task-list-header-task-name {
     padding: 16px;
     width: 15%;
-}
-
-.task-list-header-detail {
+  }
+  
+  .task-list-header-detail {
     padding: 16px;
-    width: 30%;
-}
-
-.task-list-header-due-date {
+    width: 20%;
+  }
+  
+  .task-list-header-due-date {
     padding: 16px;
     width: 10%;
-}
-
-.task-list-header-progress {
+  }
+  
+  .task-list-header-progress {
     padding: 16px;
     width: 15%;
-}
+  }
+  
+  .task-list-header-file {
+    padding: 16px;
+    width: 15%;
+  }
+  
+  .task-list-header-owner-name {
+    padding: 16px;
+    width: 15%;
+  }
+  
+  .task-list-header-links {
+    padding: 16px;
+    width: 10%;
+  }
+
 
 .table-body {
     display: flex;
@@ -162,14 +178,14 @@ body {
 }
 
 .table-body-detail {
-    width: 30%;
+    width: 20%;
     padding: 16px;
     overflow-wrap: anywhere;
     border-right: 1px solid #d8d8d8;
 }
 
 .table-body-due-date {
-    width: 10%;
+    width: 15%;
     padding: 16px;
     border-right: 1px solid #d8d8d8;
 }
@@ -179,6 +195,22 @@ body {
     padding: 16px;
     border-right: 1px solid #d8d8d8;
 }
+
+
+  .table-body-files {
+    width: 15%;
+    padding: 16px;
+    border-right: 1px solid #d8d8d8;
+  }
+  
+  .table-body-owner-name {
+    width: 15%;
+    padding: 16px;
+  }
+
+  .table-body-links {
+    width: 10%;
+  }
 
 .menu-icon {
     cursor: pointer;
@@ -355,3 +387,38 @@ body {
     width: 30%;
     padding: 16px;
   }
+
+  .uploaded-files {
+    padding: 0 50px;
+  }
+  
+  .uploaded-files-title {
+    color: rgb(85, 200, 159);
+  }
+  
+  .uploaded-file {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 30%;
+    padding: 12px;
+    border: 1px solid #333;
+    margin-bottom: 20px;
+  }
+  
+  .uploaded-file span {
+    color: #333;
+  }
+  
+  .task-progress-card-file {
+    display: flex;
+    align-items: center;
+    background-color: #e9ffee;
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  
+  
+  
+  

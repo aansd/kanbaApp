@@ -20,7 +20,9 @@ use App\Models\Task;
     <div class="task-list-header-detail">Detail</div>
     <div class="task-list-header-due-date">Due Date</div>
     <div class="task-list-header-progress">Progress</div>
+    <div class="task-list-header-file">Files</div>
     <div class="task-list-header-owner-name">Owner</div>
+    <div class="task-list-header-links"></div> 
   </div>
   
   
@@ -28,7 +30,7 @@ use App\Models\Task;
         <div class="table-body">
           <div class="table-body-task-name">
             @if ($item->status == 'completed')
-            <span class="material-icons check-icon-completed check-icon " >
+            <span class="material-icons check-icon-completed check-icon">
               check_circle
             </span>
             @else
@@ -57,6 +59,12 @@ use App\Models\Task;
                 Not Started
             @endswitch
           </div>
+          <div class="table-body-file">
+            @foreach ($item->files as $file)
+              <a href="{{ route('tasks.files.show', ['task_id' => $item->id, 'id' => $file->id]) }}">
+                {{ $file->filename }}</a>
+            @endforeach
+          </div>
           <div class="table-body-owner-name">{{ $item->user->name }}</div>
           <div class="table-body-links">
             @canany(['updateAnyTask', 'performAsTaskOwner'], $item)
@@ -66,8 +74,8 @@ use App\Models\Task;
               <a href="{{ route('tasks.delete', ['id' => $item->id]) }}">Delete</a>
             @endcan
           </div>
-          </div>
-        @endforeach
+        </div>
+          @endforeach
         </div>
       </div>
       

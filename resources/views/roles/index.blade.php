@@ -3,6 +3,7 @@
 @section('pageTitle', $pageTitle)
 
 @section('main')
+
   <div class="task-list-container">
     <h1 class="task-list-heading">{{ $pageTitle }}</h1>
     <div class="task-list-task-buttons">
