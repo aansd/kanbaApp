@@ -19,7 +19,7 @@
               {{ $user->role ? $user->role->name : 'No Role'}}
           </div>
           <div class="table-body-link">
-            @canany(['updateAnyTask', 'performAsTaskOwner'], $user)
+            @canany(['manageUserRole', 'performAsTaskOwner'], $user)
             <a href="{{ route('users.editRole', ['id' => $user->id]) }}">
               Edit Role
             </a>

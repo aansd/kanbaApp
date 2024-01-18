@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TaskFileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -24,8 +25,8 @@ Route::get('/', [TaskController::class, 'home'])
 Route::prefix('tasks')
     ->name('tasks.')
     ->middleware('auth')
-    ->controller(TaskController::class)
-    ->group(function () {
+    ->group(function () 
+    {Route::controller(TaskController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
         Route::post('/', 'store')->name('store');
@@ -35,7 +36,18 @@ Route::prefix('tasks')
         Route::delete('/{id}', 'destroy')->name('destroy');
         Route::get('progress', 'progress')->name('progress');
         Route::patch('{id}/move', 'move')->name('move');
+     });
+     Route::prefix('{task_id}/files')
+     ->name('files.')
+     ->controller(TaskFileController::class)
+     ->group(function () {
+         Route::post('store', 'store')->name('store');
+         Route::get('{id}/show', 'show')->name('show');
+         Route::delete('{id}/destroy', 'destroy')->name('destroy');
+        });
     });
+
+    
 
     Route::name('auth.')
     ->controller(AuthController::class)
