@@ -38,7 +38,7 @@ class TaskController extends Controller
     }
 
     public function create(Request $request)
-    {
+    {   
         $pageTitle = 'Create Task';
         $status = $request->status;
         session()->put('previousPage', url()->previous());
