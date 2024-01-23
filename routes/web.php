@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [TaskController::class, 'home'])
     ->name('home')
     ->middleware('auth');
+    
+
 
 Route::prefix('tasks')
     ->name('tasks.')
@@ -28,7 +30,7 @@ Route::prefix('tasks')
     ->group(function () 
     {Route::controller(TaskController::class)->group(function () {
         Route::get('/', 'index')->name('index');
-        Route::get('/create', 'create')->name('create');
+        Route::get('create', 'create')->name('create');
         Route::post('/', 'store')->name('store');
         Route::get('{id}/edit', 'edit')->name('edit');
         Route::put('/{id}', 'update')->name('update');
@@ -37,6 +39,7 @@ Route::prefix('tasks')
         Route::get('progress', 'progress')->name('progress');
         Route::patch('{id}/move', 'move')->name('move');
      });
+
      Route::prefix('{task_id}/files')
      ->name('files.')
      ->controller(TaskFileController::class)
@@ -48,8 +51,7 @@ Route::prefix('tasks')
     });
 
     
-
-    Route::name('auth.')
+Route::name('auth.')
     ->controller(AuthController::class)
     ->group(function () {
         Route::middleware('guest')->group(function () {
@@ -65,7 +67,7 @@ Route::prefix('tasks')
 
     });
 
-    Route::prefix('roles')
+Route::prefix('roles')
     ->name('roles.')
     ->middleware('auth')
     ->controller(RoleController::class)
@@ -80,7 +82,7 @@ Route::prefix('tasks')
     });
 
 
-    Route::prefix('users')
+Route::prefix('users')
     ->name('users.')
     ->middleware('auth')
     ->controller(UserController::class)
