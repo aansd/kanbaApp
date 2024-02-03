@@ -71,13 +71,13 @@ class RolePolicy
         return false;
     }
 
-    public function before($user)
-    {
-    if ($user->role && $user->role->name == 'admin') {
-        return true;
-    }
+    // public function before($user)
+    // {
+    // if ($user->role && $user->role->name == 'admin') {
+    //     return true;
+    // }
     
-    return null;
-    }
+    // return null;
+    // }
 
 }
