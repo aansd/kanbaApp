@@ -136,13 +136,19 @@ body {
 
 .task-list-header-due-date {
     padding: 16px;
-    width: 10%;
+    width: 15%;
 }
 
 .task-list-header-progress {
     padding: 16px;
     width: 15%;
 }
+.task-list-header-owner-name {
+    padding: 16px;
+    width: 10%;
+}
+
+
 
 .table-body {
     display: flex;
@@ -178,6 +184,15 @@ body {
     width: 15%;
     padding: 16px;
     border-right: 1px solid #d8d8d8;
+}
+.table-body-owner-name {
+    width: 10%;
+    padding: 16px;
+
+}
+.table-body-links {
+    width: 10%;
+   
 }
 
 .menu-icon {

@@ -21,6 +21,7 @@ use App\Models\Task;
     <div class="task-list-header-due-date">Due Date</div>
     <div class="task-list-header-progress">Progress</div>
     <div class="task-list-header-owner-name">Owner</div>
+    <div class="task-list-header-links"></div>
   </div>
   
   

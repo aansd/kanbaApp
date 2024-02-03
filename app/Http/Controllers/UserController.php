@@ -13,10 +13,9 @@ class UserController extends Controller
     public function index()
     {
         $pageTitle = 'Users List';
-        if (Gate::allows('viewUserAndRole', User::class)) {
-            $users = User::all();
-        } else {
-            $users = User::where('user_id', Auth::user()->id)->get();
+        $users = User::all();
+        if (Gate::denies('performAsTaskOwner', $users)) {
+            Gate::authorize('viewUserAndRole', User::class);
         }
         return view('users.index', ['pageTitle' => $pageTitle, 'users' => $users]);
     }
