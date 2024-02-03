@@ -4,16 +4,12 @@ namespace Tests\Feature;
 
 use App\Models\Task;
 use App\Models\User;
-use Illuminate\Console\View\Components\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Foundation\Testing\WithoutMiddleware;
-use Illuminate\Support\Facades\Request;
 
 class TaskTest extends TestCase
 {
@@ -21,10 +17,9 @@ class TaskTest extends TestCase
      * A basic feature test example.
      */
     use RefreshDatabase;
-    use WithoutMiddleware;
-    use RefreshDatabase;
-    use WithFaker;
     
+   
+   
     
     private $mockedUsers = [];
     private $mockedTasks = [];
@@ -67,6 +62,7 @@ class TaskTest extends TestCase
         $this->mockedTasks = Task::with('user', 'files')
             ->get()
             ->toArray();
+            
     }
 
     public function test_home(): void
@@ -95,7 +91,7 @@ class TaskTest extends TestCase
         Auth::logout();
 
         $response = $this->get(route('home'));
-        $response->assertStatus(500);
+        $response->assertStatus(302);
     }
 
     public function test_index_without_permission(): void
@@ -148,8 +144,8 @@ class TaskTest extends TestCase
         $this->assertEquals('Create Task', $pageTitle);
     }
     
-    public function test_store_without_file(): void
-{
+    public function test_store_without_file()
+    {
     $newTask = [
         'name' => 'New Task',
         'detail' => 'New Task Detail',
@@ -163,7 +159,7 @@ class TaskTest extends TestCase
     $response->assertRedirect(route('tasks.index'));
     $response->assertSessionHasNoErrors();
     $this->assertDatabaseHas('tasks', $newTask);
-}
+    }
 
     public function test_store_with_file(): void
     {
@@ -176,10 +172,10 @@ class TaskTest extends TestCase
             'status' => Task::STATUS_IN_PROGRESS,
         ];
 
-        // Melakukan file upload ke tempat penyimpanan tersebut
+       
         $file = UploadedFile::fake()->image('test_image.png');
 
-        // Menyimpan data task beserta dengan file
+       
         $response = $this->post(
             route('tasks.store'),
             array_merge($newTask, ['file' => $file])
@@ -195,7 +191,6 @@ class TaskTest extends TestCase
         $task = Task::where('name', 'New Task')->first();
         $this->assertNotNull($task->files);
 
-        // $this->assertCount(1, $task->files);
        
         $filePath = $task->files[0]->path;
         Storage::disk('public')->exists($filePath);
@@ -213,8 +208,199 @@ class TaskTest extends TestCase
         $response->assertSessionHasErrors(['name', 'due_date', 'status']);
     }
 
+    public function test_edit_task_owner(): void
+    {
+        $user1 = $this->mockedUsers[0];
+        $taskOwnedByUser1 = Task::where('user_id', $user1->id)->first();
     
+        $response = $this->get(route('tasks.edit', ['id' => $taskOwnedByUser1->id]));
+    
+        $response->assertStatus(200);
+        $response->assertViewIs('tasks.edit');
+        $response->assertViewHas('task', $taskOwnedByUser1);
+    }
+
+    public function test_edit_with_right_permission(): void
+    {       
+        Gate::shouldReceive('allows')
+        ->with('updateAnyTask', Task::class)
+        ->andReturn(true);
+    // Gate::shouldReceive('any')->andReturn(false);
+    // Gate::shouldReceive('check')->andReturn(false);
+    $user1 = $this->mockedUsers[0];
+    $taskOwnedByUser1 = Task::where('user_id', $user1->id)->first();
+
+    $response = $this->get(route('tasks.edit', ['id' => $taskOwnedByUser1->id]));
+    $response->assertStatus(200);
+
+    $tasks = $response->viewData('tasks');
+
+    $expectedTasks = $this->mockedTasks;
+
+    $this->assertEquals($expectedTasks, $tasks->toArray());
+    }
+
+    public function test_edit_unauthorized_user(): void
+    {
+   
+    $user1 = $this->mockedUsers[0];
+    $user2 = $this->mockedUsers[1];
+
+    $taskOwnedByUser2 = Task::factory()->create(['user_id' => $user2->id]);
+    $this->actingAs($user1);
+    $response = $this->get(route('tasks.edit', $taskOwnedByUser2->id));
+
+    $response->assertStatus(403);
+    }
+
+    public function test_update_task_owner(): void
+    {
+    $user1 = $this->mockedUsers[0];
+
+    $taskOwnedByUser1 = Task::factory()->create(['user_id' => $user1->id]);
+
+    $this->actingAs($user1);
+
+    $updatedData = [
+        'name' => 'Updated Task Name',
+        'detail' => 'Updated Task Detail',
+        'due_date' => date('Y-m-d', time()),
+        'status' => Task::STATUS_COMPLETED,
+    ];
+
+    $response = $this->put(route('tasks.update', $taskOwnedByUser1->id), $updatedData);
+
+    $response->assertStatus(200);
+
+    $this->assertDatabaseHas('tasks', [
+        'id' => $taskOwnedByUser1->id,
+        'name' => $updatedData['name'],
+        'detail' => $updatedData['detail'],
+        'due_date' => $updatedData['due_date'],
+        'status' => $updatedData['status'],
+    ]);
+    }
+
+    public function test_update_with_right_permission(): void
+    {
+    
+    $user1 = $this->mockedUsers[0];
+    $user2 = $this->mockedUsers[1];
+
+   
+    $taskOwnedByUser2 = Task::factory()->create(['user_id' => $user2->id]);
+
+   
+    Gate::shouldReceive('allows')
+        ->with('updateAnyTask', Task::class)
+        ->andReturn(true);
+
+   
+    $this->actingAs($user1);
+
+    
+    $updatedData = [
+        'name' => 'Updated Task Name',
+        'detail' => 'Updated Task Detail',
+        'due_date' => date('Y-m-d', time()),
+        'status' => Task::STATUS_COMPLETED,
+    ];
+
+    $response = $this->put(route('tasks.update', $taskOwnedByUser2->id), $updatedData);
+
+    
+    $response->assertStatus(200);
+
+    $this->assertDatabaseHas('tasks', [
+        'id' => $taskOwnedByUser2->id,
+        'name' => $updatedData['name'],
+        'detail' => $updatedData['detail'],
+        'due_date' => $updatedData['due_date'],
+        'status' => $updatedData['status'],
+    ]);
+    }
+
+    public function test_update_unauthorized_user(): void
+    {
+    $user1 = $this->mockedUsers[0];
+    $user2 = $this->mockedUsers[1];
+
+    $taskOwnedByUser2 = Task::factory()->create(['user_id' => $user2->id]);
+
+    $this->actingAs($user1);
+
+    Gate::shouldReceive('allows')
+        ->with('updateAnyTask', Task::class)
+        ->andReturn(false);
+
+    $updatedData = [
+        'name' => 'Updated Task Name',
+        'detail' => 'Updated Task Detail',
+        'due_date' => date('Y-m-d', time()),
+        'status' => Task::STATUS_COMPLETED,
+    ];
+
+    $response = $this->put(route('tasks.update', $taskOwnedByUser2->id), $updatedData);
+
+    $response->assertStatus(500);
+    $this->assertDatabaseMissing('tasks', [
+        'id' => $taskOwnedByUser2->id,
+        'name' => $updatedData['name'],
+        'detail' => $updatedData['detail'],
+        'due_date' => $updatedData['due_date'],
+        'status' => $updatedData['status'],
+    ]);
+    }
+
+    public function test_delete_task_owner(): void
+    {
+    $user1 = $this->mockedUsers[0];
+
+    $taskOwnedByUser1 = Task::factory()->create(['user_id' => $user1->id]);
+
+    $this->actingAs($user1);
+
+    $response = $this->get(route('tasks.delete', $taskOwnedByUser1->id));
+
+    $response->assertStatus(200);
+
+    $response->assertViewHas('task', function ($taskFromView) use ($taskOwnedByUser1) {
+        return $taskFromView->id === $taskOwnedByUser1->id;
+    });
+    }
+
     
 
+    public function test_delete_unauthorized_user(): void
+    {
+       
+        $user1 = $this->mockedUsers[0];
+        $user2 = $this->mockedUsers[1];
+       
+        $taskOwnedByUser2 = Task::factory()->create(['user_id' => $user2->id]);
+    
+        Gate::shouldReceive('allows')
+            ->with('delete', $taskOwnedByUser2)
+            ->andReturn(false);
+    
+            $this->actingAs($user1);
+    
+        $response = $this->delete(route('tasks.delete', ['id' => $taskOwnedByUser2->id]));
+    
+        $response->assertStatus(405);
+    }
+
+    public function test_destroy_task_owner(): void
+    {
+        $taskOwnedByUser1 = Task::where('user_id', $this->mockedUsers[0]->id)->first();
+        $response = $this->delete(route('tasks.destroy', ['id' => $taskOwnedByUser1->id]));
+
+        $response->assertStatus(302);
+
+        $this->assertDatabaseMissing('tasks', ['id' => $taskOwnedByUser1->id]);
+    }
+    
+
+    
     
 }
