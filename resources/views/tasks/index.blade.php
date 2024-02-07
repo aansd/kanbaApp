@@ -52,7 +52,7 @@ use App\Models\Task;
               @case('in_review')
                 Waiting/In Review
                 @break
-              @case('completed')
+              @case('completed')`
                 Completed
                 @break
               @default

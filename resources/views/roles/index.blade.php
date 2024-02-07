@@ -7,13 +7,11 @@
   <div class="task-list-container">
     <h1 class="task-list-heading">{{ $pageTitle }}</h1>
     <div class="task-list-task-buttons">
-      @canany(['viewAnyRole', 'performAsTaskOwner'], $roles)
       <a href="{{ route('roles.create') }}">
         <button  class="task-list-button">
           <span class="material-icons">add</span>Add Role
         </button>
       </a>
-      @endcan
     </div>
 
     <div>

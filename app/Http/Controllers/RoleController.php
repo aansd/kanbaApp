@@ -14,10 +14,9 @@ class RoleController extends Controller
     public function index()
     {
         $pageTitle = 'Role Lists';
-        if (Gate::allows('viewAnyRole', Role::class)) {
-            $roles = Role::all();
-        } else {
-            $roles = Role::where('user_id', Auth::user()->id)->get();
+        $roles = Role::all();
+        if (Gate::denies('performAsTaskOwner', $roles)) {
+            Gate::authorize('viewAnyRole', Role::class);
         }
         return view('roles.index', ['pageTitle' => $pageTitle, 'roles' => $roles]);
     }
@@ -26,7 +25,7 @@ class RoleController extends Controller
     {
         $pageTitle = 'Add Role';
         $permissions = Permission::all();
-        $this->authorize('createAnyRole', Role::class);
+        $this->authorize('createNewRole', Role::class);
         $roles = Role::with(['users', 'permissions'])->get();
         return view('roles.create', ['pageTitle' => $pageTitle, 'permissions' => $permissions, 'roles' => $roles]);
     }

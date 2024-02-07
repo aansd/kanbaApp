@@ -136,7 +136,7 @@ body {
   
   .task-list-header-due-date {
     padding: 16px;
-    width: 10%;
+    width: 15%;
   }
   
   .task-list-header-progress {
@@ -154,10 +154,12 @@ body {
     width: 15%;
   }
   
-  .task-list-header-links {
+  /* .task-list-header-links {
+
     padding: 16px;
     width: 10%;
   }
+   */
 
 
 .table-body {
@@ -197,7 +199,7 @@ body {
 }
 
 
-  .table-body-files {
+  .table-body-file {
     width: 15%;
     padding: 16px;
     border-right: 1px solid #d8d8d8;
@@ -211,6 +213,8 @@ body {
   .table-body-links {
     width: 10%;
   }
+
+  
 
 .menu-icon {
     cursor: pointer;
@@ -356,9 +360,6 @@ body {
     font-size: 30px;
   }
 
-  .table-body-links {
-    width: 10%;
-  }
 
   .table-body-role-name {
     width: 15%;
