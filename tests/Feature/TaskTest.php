@@ -81,10 +81,6 @@ class TaskTest extends TestCase
         $this->assertEquals(2, $uncompleted_count);
     }
 
-    // public function test_index(): void
-    // {
-    //     // Data pengujian bisa digunakan di sini
-    // }
 
     public function test_redirect_not_logged_in_user(): void
     {
@@ -221,173 +217,139 @@ class TaskTest extends TestCase
     }
 
     public function test_edit_with_right_permission(): void
-    {       
-        Gate::shouldReceive('allows')
+    {
+    $taskOwnedByUser2 = Task::where('user_id', '!=', $this->mockedUsers[0]->id)->first();
+
+    Gate::shouldReceive('allows')
         ->with('updateAnyTask', Task::class)
         ->andReturn(true);
-    // Gate::shouldReceive('any')->andReturn(false);
-    // Gate::shouldReceive('check')->andReturn(false);
-    $user1 = $this->mockedUsers[0];
-    $taskOwnedByUser1 = Task::where('user_id', $user1->id)->first();
 
-    $response = $this->get(route('tasks.edit', ['id' => $taskOwnedByUser1->id]));
+    $this->actingAs($this->mockedUsers[0]);
+
+    $response = $this->get(route('tasks.edit', ['id' => $taskOwnedByUser2->id]));
+
     $response->assertStatus(200);
 
-    $tasks = $response->viewData('tasks');
-
-    $expectedTasks = $this->mockedTasks;
-
-    $this->assertEquals($expectedTasks, $tasks->toArray());
+    $response->assertViewHas('task', $taskOwnedByUser2);
     }
+
 
     public function test_edit_unauthorized_user(): void
     {
-   
-    $user1 = $this->mockedUsers[0];
-    $user2 = $this->mockedUsers[1];
 
-    $taskOwnedByUser2 = Task::factory()->create(['user_id' => $user2->id]);
-    $this->actingAs($user1);
-    $response = $this->get(route('tasks.edit', $taskOwnedByUser2->id));
+    $taskOwnedByUser2 = Task::where('user_id', '!=', $this->mockedUsers[0]->id)->first();
+    $this->actingAs($this->mockedUsers[0]);
+    $response = $this->get(route('tasks.edit', ['id' => $taskOwnedByUser2->id]));
 
     $response->assertStatus(403);
     }
-
+        
     public function test_update_task_owner(): void
     {
-    $user1 = $this->mockedUsers[0];
-
-    $taskOwnedByUser1 = Task::factory()->create(['user_id' => $user1->id]);
-
-    $this->actingAs($user1);
+    
+    $taskOwnedByUser1 = Task::where('user_id', $this->mockedUsers[0]->id)->first();
 
     $updatedData = [
         'name' => 'Updated Task Name',
         'detail' => 'Updated Task Detail',
-        'due_date' => date('Y-m-d', time()),
+        'due_date' => '2024-01-10', 
         'status' => Task::STATUS_COMPLETED,
     ];
 
-    $response = $this->put(route('tasks.update', $taskOwnedByUser1->id), $updatedData);
+   
+    $this->actingAs($this->mockedUsers[0]);
+
+    $response = $this->put(route('tasks.update', ['id' => $taskOwnedByUser1->id]), $updatedData);
 
     $response->assertStatus(200);
 
-    $this->assertDatabaseHas('tasks', [
-        'id' => $taskOwnedByUser1->id,
-        'name' => $updatedData['name'],
-        'detail' => $updatedData['detail'],
-        'due_date' => $updatedData['due_date'],
-        'status' => $updatedData['status'],
-    ]);
+    $this->assertDatabaseHas('tasks', $updatedData);
     }
 
     public function test_update_with_right_permission(): void
     {
-    
-    $user1 = $this->mockedUsers[0];
-    $user2 = $this->mockedUsers[1];
+    $taskOwnedByUser2 = Task::where('user_id', '!=', $this->mockedUsers[0]->id)->first();
 
-   
-    $taskOwnedByUser2 = Task::factory()->create(['user_id' => $user2->id]);
+    $updatedData = [
+        'name' => 'Updated Task Name',
+        'detail' => 'Updated Task Detail',
+        'due_date' => '2024-01-10',
+        'status' => Task::STATUS_COMPLETED,
+    ];
 
-   
     Gate::shouldReceive('allows')
         ->with('updateAnyTask', Task::class)
         ->andReturn(true);
 
-   
-    $this->actingAs($user1);
+    $this->actingAs($this->mockedUsers[0]);
 
-    
-    $updatedData = [
-        'name' => 'Updated Task Name',
-        'detail' => 'Updated Task Detail',
-        'due_date' => date('Y-m-d', time()),
-        'status' => Task::STATUS_COMPLETED,
-    ];
+    $response = $this->put(route('tasks.update', ['id' => $taskOwnedByUser2->id]), $updatedData);
 
-    $response = $this->put(route('tasks.update', $taskOwnedByUser2->id), $updatedData);
-
-    
     $response->assertStatus(200);
 
-    $this->assertDatabaseHas('tasks', [
-        'id' => $taskOwnedByUser2->id,
-        'name' => $updatedData['name'],
-        'detail' => $updatedData['detail'],
-        'due_date' => $updatedData['due_date'],
-        'status' => $updatedData['status'],
-    ]);
+    $this->assertDatabaseHas('tasks', $updatedData);
     }
 
     public function test_update_unauthorized_user(): void
     {
-    $user1 = $this->mockedUsers[0];
-    $user2 = $this->mockedUsers[1];
+    $taskOwnedByUser2 = Task::where('user_id', '!=', $this->mockedUsers[0]->id)->first();
 
-    $taskOwnedByUser2 = Task::factory()->create(['user_id' => $user2->id]);
-
-    $this->actingAs($user1);
-
-    Gate::shouldReceive('allows')
-        ->with('updateAnyTask', Task::class)
-        ->andReturn(false);
 
     $updatedData = [
         'name' => 'Updated Task Name',
         'detail' => 'Updated Task Detail',
-        'due_date' => date('Y-m-d', time()),
+        'due_date' => '2024-01-10',
         'status' => Task::STATUS_COMPLETED,
     ];
 
-    $response = $this->put(route('tasks.update', $taskOwnedByUser2->id), $updatedData);
+    $this->actingAs($this->mockedUsers[0]);
 
-    $response->assertStatus(500);
-    $this->assertDatabaseMissing('tasks', [
-        'id' => $taskOwnedByUser2->id,
-        'name' => $updatedData['name'],
-        'detail' => $updatedData['detail'],
-        'due_date' => $updatedData['due_date'],
-        'status' => $updatedData['status'],
-    ]);
+    $response = $this->put(route('tasks.update', ['id' => $taskOwnedByUser2->id]), $updatedData);
+
+    $response->assertStatus(403);
+
+    $this->assertDatabaseMissing('tasks', $updatedData);
     }
 
     public function test_delete_task_owner(): void
     {
-    $user1 = $this->mockedUsers[0];
+    $taskOwnedByUser1 = Task::where('user_id', $this->mockedUsers[0]->id)->first();
 
-    $taskOwnedByUser1 = Task::factory()->create(['user_id' => $user1->id]);
+    $this->actingAs($this->mockedUsers[0]);
 
-    $this->actingAs($user1);
-
-    $response = $this->get(route('tasks.delete', $taskOwnedByUser1->id));
+    $response = $this->get(route('tasks.delete', ['id' => $taskOwnedByUser1->id]));
 
     $response->assertStatus(200);
 
-    $response->assertViewHas('task', function ($taskFromView) use ($taskOwnedByUser1) {
-        return $taskFromView->id === $taskOwnedByUser1->id;
-    });
+    $response->assertViewHas('task', $taskOwnedByUser1);
     }
 
-    
+    public function test_delete_with_right_permission(): void
+    {
+    $taskOwnedByUser2 = Task::where('user_id', '!=', $this->mockedUsers[0]->id)->first();
+
+    Gate::shouldReceive('allows')
+        ->with('deleteAnyTask', Task::class)
+        ->andReturn(true);
+    $this->actingAs($this->mockedUsers[0]);
+
+  
+    $response = $this->get(route('tasks.delete', ['id' => $taskOwnedByUser2->id]));
+
+    $response->assertStatus(200);
+
+    $response->assertViewHas('task', $taskOwnedByUser2);
+    }
 
     public function test_delete_unauthorized_user(): void
     {
-       
-        $user1 = $this->mockedUsers[0];
-        $user2 = $this->mockedUsers[1];
-       
-        $taskOwnedByUser2 = Task::factory()->create(['user_id' => $user2->id]);
-    
-        Gate::shouldReceive('allows')
-            ->with('delete', $taskOwnedByUser2)
-            ->andReturn(false);
-    
-            $this->actingAs($user1);
-    
-        $response = $this->delete(route('tasks.delete', ['id' => $taskOwnedByUser2->id]));
-    
-        $response->assertStatus(405);
+        $taskOwnedByUser2 = Task::where('user_id', '!=', $this->mockedUsers[0]->id)->first();
+
+        $this->actingAs($this->mockedUsers[0]);
+
+        $response = $this->get(route('tasks.delete', ['id' => $taskOwnedByUser2->id]));
+
+        $response->assertStatus(403);
     }
 
     public function test_destroy_task_owner(): void
@@ -395,12 +357,188 @@ class TaskTest extends TestCase
         $taskOwnedByUser1 = Task::where('user_id', $this->mockedUsers[0]->id)->first();
         $response = $this->delete(route('tasks.destroy', ['id' => $taskOwnedByUser1->id]));
 
-        $response->assertStatus(302);
+        $response->assertStatus(302);//200
 
         $this->assertDatabaseMissing('tasks', ['id' => $taskOwnedByUser1->id]);
     }
-    
 
+    public function test_destroy_with_right_permission(): void
+    {
+    $taskOwnedByUser2 = Task::where('user_id', '!=', $this->mockedUsers[0]->id)->first();
+
+    Gate::shouldReceive('allows')
+        ->with('deleteAnyTask', Task::class)
+        ->andReturn(true);
+
+    $this->actingAs($this->mockedUsers[0]);
+
+    $response = $this->delete(route('tasks.destroy', ['id' => $taskOwnedByUser2->id]));
+
+    $response->assertStatus(200);
+
+    $this->assertDatabaseMissing('tasks', ['id' => $taskOwnedByUser2->id]);
+    }
+
+    public function test_destroy_unauthorized_user(): void
+    {
+    $taskOwnedByUser2 = Task::where('user_id', '!=', $this->mockedUsers[0]->id)->first();
+
+    $this->actingAs($this->mockedUsers[0]);
+
+    $response = $this->delete(route('tasks.destroy', ['id' => $taskOwnedByUser2->id]));
+
+    $response->assertStatus(403);
+
+    $this->assertDatabaseHas('tasks', ['id' => $taskOwnedByUser2->id]);
+    }
+    
+    public function test_progress_without_permission(): void
+    {
+    $this->actingAs($this->mockedUsers[0]);
+
+    $tasksOwnedByUser1 = Task::where('user_id', $this->mockedUsers[0]->id)->get();
+
+    $tasksOwnedByOtherUsers = Task::where('user_id', '!=', $this->mockedUsers[0]->id)->get();
+
+    $response = $this->get(route('tasks.progress'));
+
+    $response->assertStatus(200);
+
+    foreach ($tasksOwnedByUser1 as $task) {
+        $response->assertSee($task->name);
+    }
+
+    foreach ($tasksOwnedByOtherUsers as $task) {
+        $response->assertDontSee($task->name);
+    }
+
+    $response->assertViewHas('tasks');
+    $tasks = $response->viewData('tasks');
+    $this->assertArrayHasKey('not_started', $tasks);
+    $this->assertArrayHasKey('in_progress', $tasks);
+    $this->assertArrayHasKey('in_review', $tasks);
+    $this->assertArrayHasKey('completed', $tasks);
+    }
+
+    public function test_progress_with_right_permission(): void
+    {
+        Gate::shouldReceive('allows')
+        ->with('viewAnyTask', Task::class)
+        ->andReturn(true);
+    Gate::shouldReceive('any')->andReturn(false);
+    Gate::shouldReceive('check')->andReturn(false);
+
+    $this->actingAs($this->mockedUsers[0]);
+
+    $allTasks = Task::all();
+
+    $response = $this->get(route('tasks.progress'));
+
+    $response->assertStatus(200);
+
+    foreach ($allTasks as $task) {
+        $response->assertSee($task->name);
+    }
+
+    $response->assertViewHas('tasks');
+    $tasks = $response->viewData('tasks');
+    $this->assertArrayHasKey('not_started', $tasks);
+    $this->assertArrayHasKey('in_progress', $tasks);
+    $this->assertArrayHasKey('in_review', $tasks);
+    $this->assertArrayHasKey('completed', $tasks);
+    }
+
+    public function test_move_task_owner(): void
+    {
+    $this->actingAs($this->mockedUsers[0]);
+
+    $taskOwnedByUser1 = Task::where('user_id', $this->mockedUsers[0]->id)->first();
+
+    $newStatus = Task::STATUS_IN_PROGRESS;
+ 
+    $response = $this->patch(route('tasks.move', ['id' => $taskOwnedByUser1->id]), ['status' => $newStatus]);
+
+    
+    $response->assertStatus(302);//200
+
+    $taskOwnedByUser1->refresh();
+
+    $this->assertEquals($newStatus, $taskOwnedByUser1->status);
+    }   
+
+    public function test_move_with_right_permission(): void
+    {
+    Gate::shouldReceive('allows')
+        ->with('updateAnyTask', Task::class)
+        ->andReturn(true);
+    Gate::shouldReceive('any')->andReturn(false);
+    Gate::shouldReceive('check')->andReturn(false);
+
+    $this->actingAs($this->mockedUsers[0]);
+
+    $taskOwnedByUser2 = Task::where('user_id', '!=', $this->mockedUsers[0]->id)->first();
+
+    $newStatus = Task::STATUS_IN_PROGRESS;
+
+    $response = $this->patch(route('tasks.move', ['id' => $taskOwnedByUser2->id]), ['status' => $newStatus]);
+
+    $response->assertStatus(200);
+
+    $taskOwnedByUser2->refresh();
+
+    $this->assertEquals($newStatus, $taskOwnedByUser2->status);
+    }
+
+    public function test_move_unauthorized_user(): void
+    {
+    $this->actingAs($this->mockedUsers[0]);
+
+    $taskOwnedByUser2 = Task::where('user_id', '!=', $this->mockedUsers[0]->id)->first();
+
+    $newStatus = Task::STATUS_IN_PROGRESS;
+
+    $response = $this->patch(route('tasks.move', ['id' => $taskOwnedByUser2->id]), ['status' => $newStatus]);
+
+    $response->assertStatus(403);
+
+    $taskOwnedByUser2->refresh();
+
+    $this->assertNotEquals($newStatus, $taskOwnedByUser2->status);
+    }
+
+    public function test_complete_task_owner(): void
+    {
+    $this->actingAs($this->mockedUsers[0]);
+
+    $taskOwnedByUser1 = Task::where('user_id', $this->mockedUsers[0]->id)->first();
+
+    $newStatus = Task::STATUS_COMPLETED;
+
+    $response = $this->patch(route('tasks.completed', ['id' => $taskOwnedByUser1->id]));
+
+    $response->assertStatus(302);//200
+
+    $taskOwnedByUser1->refresh();
+
+    $this->assertEquals($newStatus, $taskOwnedByUser1->status);
+    }
+
+    public function test_complete_unauthorized_user(): void
+    {
+    $this->actingAs($this->mockedUsers[0]);
+
+    $taskOwnedByUser2 = Task::where('user_id', '!=', $this->mockedUsers[0]->id)->first();
+
+    $newStatus = Task::STATUS_IN_PROGRESS;
+
+    $response = $this->patch(route('tasks.completed', ['id' => $taskOwnedByUser2->id]));
+
+    $response->assertStatus(403);
+
+    $taskOwnedByUser2->refresh();
+
+    $this->assertNotEquals($newStatus, $taskOwnedByUser2->status);
+    }
     
     
 }

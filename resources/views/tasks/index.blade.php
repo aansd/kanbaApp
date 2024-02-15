@@ -34,7 +34,7 @@ use App\Models\Task;
               check_circle
             </span>
             @else
-            <form method="post" action="{{ route('tasks.move', ['id' => $item->id, 'status' =>Task::STATUS_COMPLETED]) }}" id="setcompleted-{{$item->id}}">
+            <form method="post" action="{{ route('tasks.completed', ['id' => $item->id]) }}" id="setcompleted-{{$item->id}}">
               @method('patch')
               @csrf
             <span class="material-icons check-icon " onclick="document.getElementById('setcompleted-{{$item->id}}').submit()">check_circle</span>

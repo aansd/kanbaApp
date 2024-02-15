@@ -7,7 +7,7 @@ use App\Models\Task;
       @if ($task->status == 'completed')
         <div class="material-icons task-progress-card-top-checked" >check_circle</div>      
         @else       
-        <form method="post" action="{{ route('tasks.move', ['id' => $task->id, 'status' =>Task::STATUS_COMPLETED]) }}" id="setcompleted-{{$task->id}}">
+        <form method="post" action="{{ route('tasks.completed', ['id' => $task->id]) }}" id="setcompleted-{{$task->id}}">
           @method('patch')
           @csrf
           <div class="material-icons task-progress-card-top-check" onclick="document.getElementById('setcompleted-{{$task->id}}').submit()">check_circle</div>

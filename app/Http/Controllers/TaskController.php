@@ -80,7 +80,6 @@ class TaskController extends Controller
                 'status' => $request->status,
                 'user_id' => Auth::user()->id
             ]);
-    
             $file = $request->file('file');
             if ($file) {
                 $filename = $file->getClientOriginalName();
@@ -226,6 +225,19 @@ class TaskController extends Controller
      {
         return back()->withInput();
      }
+    }
+
+    public function completed(int $id, Request $request)
+    {
+        $task = Task::findOrFail($id);
+        if (Gate::denies('performAsTaskOwner', $task)) {
+            Gate::authorize('updateAnyTask', Task::class);
+        }
+        $task->update([
+            'status' => Task::STATUS_COMPLETED,
+        ]);
+
+        return back()->withInput();
     }
 
     public function home()
